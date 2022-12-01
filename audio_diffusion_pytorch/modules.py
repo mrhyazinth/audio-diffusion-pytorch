@@ -1165,6 +1165,7 @@ class UNetCFG1d(UNet1d):
         time: Tensor,
         *,
         embedding: Tensor,
+        negative_embedding: Optional[Tensor] = None,
         embedding_scale: float = 1.0,
         embedding_mask_proba: float = 0.0,
         **kwargs,
@@ -1182,7 +1183,7 @@ class UNetCFG1d(UNet1d):
         if embedding_scale != 1.0:
             # Compute both normal and fixed embedding outputs
             out = super().forward(x, time, embedding=embedding, **kwargs)
-            out_masked = super().forward(x, time, embedding=fixed_embedding, **kwargs)
+            out_masked = super().forward(x, time, embedding=(fixed_embedding if(negative_embedding == None) else negative_embedding), **kwargs)
             # Scale conditional output using classifier-free guidance
             return out_masked + (out - out_masked) * embedding_scale
         else:
